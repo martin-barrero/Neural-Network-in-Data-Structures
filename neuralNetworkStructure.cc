@@ -14,7 +14,7 @@ class Neuron{
     public:
     Neuron(double amountWeights = 0.0):
         inputWeights(amountWeights, 0.0), bias_(1), output_(0.0) {
-            for(double &num : inputWeights){
+            for(double num : inputWeights){
                 num = (rand() % 200 - 100) / 100.0; // Pesos entre -1.0 y 1.0
             }
         }
