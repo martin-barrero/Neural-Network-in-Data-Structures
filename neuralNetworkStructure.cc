@@ -1,5 +1,7 @@
 #include <iostream>
 #include <vector>
+#include <time.h>
+
 
 using namespace std;
 
@@ -11,18 +13,15 @@ class Neuron{
 
     public:
     Neuron(double amountWeights = 0.0):
-        inputWeights(amountWeights, 0.0), bias_(1), output_(0.0) {}
-
-    //Esta operacion no es demasiado eficiente pero es solamente para pruebas, luego se puede desarrollar una idea mejor en otras versiones del código
-    void inicializateNeuronWeights(vector<double> &weights){ //Pasa unos pesos dados al vector de inputWeigths de la neurona
-        for(int i = 0; i < weights.size(); i++){
-            inputWeights[i] = weights[i];
+        inputWeights(amountWeights, 0.0), bias_(1), output_(0.0) {
+            for(double &num : inputWeights){
+                num = (rand() % 200 - 100) / 100.0; // Pesos entre -1.0 y 1.0
+            }
         }
-    }
     
     //Operaciones para imprimir parámetros de la neurona, solo para pruebas manuales
     void printWeigths(){
-        for(int c : inputWeights){
+        for(double c : inputWeights){
             cout << c << " ";
         }
         cout << endl;
@@ -46,7 +45,8 @@ class Neuron{
             summation += iteration;
         }
         summation += bias_;
-        return activationReLu(summation);
+        output_ = activationReLu(summation);
+        return output_;
     }
 };
 
@@ -58,21 +58,41 @@ class NeuralNetwork {
     vector<Neuron> output;
 
     public:
-    NeuralNetwork(vector<double> &firstWeights, unsigned int h, unsigned int numOfNeurons = 5):
-        input(10, Neuron(0)), midLayers(5, vector<Neuron> (5, Neuron(3))), output(2, Neuron(3)) {}
+    NeuralNetwork(unsigned int h = 3, unsigned int numOfNeurons = 3):
+        input(5, Neuron(0)), midLayers(h, vector<Neuron> (numOfNeurons, Neuron(numOfNeurons))), output(2, Neuron(3)) {}
+
+    vector<double> forward(vector<double> &inputs){
+        vector<double> layerInputs = inputs;
+        for(int i = 0; i < midLayers.size(); i++){
+            vector<double> newInputs;
+            for(int j = 0; j < midLayers[i].size(); j++){
+                newInputs.push_back(midLayers[i][j].calculateOutputValue(layerInputs));
+            }
+            layerInputs = newInputs;
+        }
+        vector<double> outputs;
+        for(int i = 0; i < output.size(); i++){
+            outputs.push_back(output[i].calculateOutputValue(layerInputs));
+        }
+        return outputs;
+    }
+    
 };
 
 int main(){
     //Pruebas
-    vector<double> weights = {1, 2, 3};
-    vector<double> inputs = {4, 2, 2};
-    Neuron prueba(3);
+    srand(time(0));
 
-    prueba.inicializateNeuronWeights(weights);
-    prueba.printBias();
-    prueba.printWeigths();
+    vector<double> inputs = {1, 2, 1, 4, 2};
+    NeuralNetwork prueba;
 
-    double pruebaOutput = prueba.calculateOutputValue(inputs);
-    cout << pruebaOutput << endl;
+    vector<double> outputValues = prueba.forward(inputs);
+    
+    cout << "Salidas de la red neuronal:" << endl;
+    for (double val : outputValues) {
+        cout << val << " ";
+    }
+    cout << endl;
+
     return 0;
 }
