@@ -143,8 +143,7 @@ class RedNeuronalBST {
         red.insertarNeurona(2, 0.3, {0.4});         // Capa 2, Neurona 0
         red.insertarNeurona(0, 0.4, {0.7, 0.2});    // Capa 0, Neurona 1
         red.insertarNeurona(1, 0.5, {0.6, 0.8});    // Capa 1, Neurona 1
-    
-        // Mostrar el árbol ordenado por ID
+
         red.mostrarRed();
         
         return 0;
