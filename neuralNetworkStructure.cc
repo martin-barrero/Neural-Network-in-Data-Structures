@@ -1,9 +1,18 @@
 #include <iostream>
 #include <vector>
 #include <time.h>
+#include <random>
 
 
 using namespace std;
+
+static random_device rd; 
+static mt19937 gen(rd()); 
+
+double randomFloat(double min, double max) {
+    uniform_real_distribution<double> dis(min, max);
+    return dis(gen);
+}
 
 class Neuron{ 
     private:
@@ -14,13 +23,14 @@ class Neuron{
     public:
     Neuron(double amountWeights = 0.0):
         inputWeights(amountWeights, 0.0), bias_(1), output_(0.0) {
-            for(double &num : inputWeights){
-                num = (rand() % 200 - 100) / 100.0; // Pesos entre -1.0 y 1.0
+            for(double &numero : inputWeights){
+                numero = randomFloat(0.0, 1.0);
             }
         }
     
     //Operaciones para imprimir parámetros de la neurona, solo para pruebas manuales
-    void printWeigths(){
+    void printWeigths(int i, int j){
+        cout << "Capa: " << i << " Neurona: " << j << " " ;
         for(double c : inputWeights){
             cout << c << " ";
         }
@@ -58,14 +68,30 @@ class NeuralNetwork {
     vector<Neuron> output;
 
     public:
-    NeuralNetwork(unsigned int h = 3, unsigned int numOfNeurons = 3):
-        input(5, Neuron(0)), midLayers(h, vector<Neuron> (numOfNeurons, Neuron(numOfNeurons))), output(2, Neuron(3)) {}
+    NeuralNetwork(unsigned int h = 3, unsigned int numOfNeurons = 3){
+        for(int i = 0; i < 5; i++){
+            input.push_back(Neuron(0));
+        }
+
+        for(int i = 0; i < h; i++){
+            vector<Neuron> layer;
+            for(int j = 0; j < numOfNeurons; j++){
+                layer.push_back(Neuron(3));
+            }
+            midLayers.push_back(layer);
+        }
+
+        for(int i = 0; i < 2; i++){
+            output.push_back(Neuron(3));
+        }
+    }
 
     vector<double> forward(vector<double> &inputs){
         vector<double> layerInputs = inputs;
         for(int i = 0; i < midLayers.size(); i++){
             vector<double> newInputs;
             for(int j = 0; j < midLayers[i].size(); j++){
+                midLayers[i][j].printWeigths(i, j);
                 newInputs.push_back(midLayers[i][j].calculateOutputValue(layerInputs));
             }
             layerInputs = newInputs;
@@ -80,9 +106,6 @@ class NeuralNetwork {
 };
 
 int main(){
-    //Pruebas
-    srand(time(0));
-
     vector<double> inputs = {1, 2, 1, 4, 2};
     NeuralNetwork prueba;
 
