@@ -14,55 +14,56 @@ double randomFloat(double min, double max) {
     return dis(gen);
 }
 
-class Neuron{ 
-    private:
-    vector<double> inputWeights;
-    double bias_;
-    double output_;
-
-    public:
-    Neuron(double amountWeights = 0.0):
-        inputWeights(amountWeights, 0.0), bias_(1), output_(0.0) {
-            for(double &numero : inputWeights){
-                numero = randomFloat(0.0, 1.0);
-            }
-        }
-    
-    //Operaciones para imprimir parámetros de la neurona, solo para pruebas manuales
-    void printWeigths(int i, int j){
-        cout << "Capa: " << i << " Neurona: " << j << " " ;
-        for(double c : inputWeights){
-            cout << c << " ";
-        }
-        cout << endl;
-    }
-
-    void printBias(){
-        cout << "bias: " << bias_ << endl;
-    }
-
-    //Operacion activacion ReLu
-    double activationReLu(double value){
-        if (value > 0) return value;
-        else return 0;
-    }
-
-    //Operacion cálculo output de la neurona
-    double calculateOutputValue(vector<double> &inputValues){ 
-        double summation = 0.0;
-        for(int i = 0; i < inputWeights.size(); i++){
-            double iteration = inputValues[i] * inputWeights[i];
-            summation += iteration;
-        }
-        summation += bias_;
-        output_ = activationReLu(summation);
-        return output_;
-    }
-};
-
 //Clase Principal
 class NeuralNetwork {
     private:
+    //Clase interna
+    class Neuron{ 
+        private:
+        vector<double> inputWeights;
+        double bias_;
+        double output_;
+    
+        public:
+        Neuron(double amountWeights = 0.0):
+            inputWeights(amountWeights, 0.0), bias_(1), output_(0.0) {
+                for(double &numero : inputWeights){
+                    numero = randomFloat(0.0, 1.0);
+                }
+            }
+        
+        //Operaciones para imprimir parámetros de la neurona, solo para pruebas manuales
+        void printWeigths(int i, int j){
+            cout << "Capa: " << i << " Neurona: " << j << " " ;
+            for(double c : inputWeights){
+                cout << c << " ";
+            }
+            cout << endl;
+        }
+    
+        void printBias(){
+            cout << "bias: " << bias_ << endl;
+        }
+    
+        //Operacion activacion ReLu
+        double activationReLu(double value){
+            if (value > 0) return value;
+            else return 0;
+        }
+    
+        //Operacion cálculo output de la neurona
+        double calculateOutputValue(vector<double> &inputValues){ 
+            double summation = 0.0;
+            for(int i = 0; i < inputWeights.size(); i++){
+                double iteration = inputValues[i] * inputWeights[i];
+                summation += iteration;
+            }
+            summation += bias_;
+            output_ = activationReLu(summation);
+            return output_;
+        }
+    };
+
     vector<Neuron> input;
     vector<vector<Neuron>> midLayers;
     vector<Neuron> output;
@@ -91,12 +92,12 @@ class NeuralNetwork {
         for(int i = 0; i < midLayers.size(); i++){
             vector<double> newInputs;
             for(int j = 0; j < midLayers[i].size(); j++){
-                midLayers[i][j].printWeigths(i, j);
+                midLayers[i][j].printWeigths(i, j); // solo para la depuracion
                 newInputs.push_back(midLayers[i][j].calculateOutputValue(layerInputs));
             }
-            layerInputs = newInputs;
+            layerInputs = newInputs; // la salida de la capa n es la entrada de la capa m
         }
-        vector<double> outputs;
+        vector<double> outputs; // capa de salida
         for(int i = 0; i < output.size(); i++){
             outputs.push_back(output[i].calculateOutputValue(layerInputs));
         }
